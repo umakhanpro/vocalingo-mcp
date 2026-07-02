@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "vocalingo": {
+      "url": "https://nodejs.vocalingo.app/mcp",
+      "headers": { "Authorization": "Bearer vlmcp_YOUR_TOKEN" }
+    }
+  }
+}
