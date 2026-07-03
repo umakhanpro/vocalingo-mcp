@@ -116,6 +116,7 @@ Clones a voice from an audio sample and saves it to the account. Waits for compl
 | `name` | string | Voice name |
 | `fileId` / `url` | string | Audio sample: **minimum 10 sec**, up to 60 sec of clean speech (longer audio is trimmed automatically) |
 | `language` | string? | Sample language (auto-detected if omitted) |
+| `dryRun` | bool? | Cost estimate only, nothing cloned or charged |
 
 Only clone voices you own or have explicit consent to use.
 
@@ -166,6 +167,7 @@ Transcribes audio. Returns text + detected language.
 | Param | Type | Description |
 |---|---|---|
 | `fileId` / `url` | string | Audio (max 50 MB) |
+| `dryRun` | bool? | Cost estimate only, nothing transcribed or charged |
 
 ### `translate_audio` — paid, job
 
