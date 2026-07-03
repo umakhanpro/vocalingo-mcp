@@ -13,6 +13,66 @@ Conventions:
 
 ---
 
+## Recipes (exact call sequences)
+
+Follow these step by step. Do not add extra calls.
+
+**1. Summarize a YouTube / TikTok / Instagram video**
+
+```
+summarize_media { url: "<link>" }        → returns jobId
+check_job { jobId }                      → repeat every 10-30s until completed
+```
+
+No upload step needed — the server downloads platform links itself.
+
+**2. Translate a local voice message, keep the speaker's voice**
+
+```
+get_upload_url { filename: "voice.ogg" } → returns fileId + uploadUrl + curl example
+<run the curl command to upload the file>
+translate_audio { targetLanguage: "en", fileId: "<fileId>", voiceMode: "clone", dryRun: true }  → show estimate
+translate_audio { targetLanguage: "en", fileId: "<fileId>", voiceMode: "clone" }                → returns jobId
+check_job { jobId }                      → repeat until completed
+```
+
+**3. Read a text aloud with the user's own voice**
+
+```
+list_voices {}                           → pick voiceId (status must be "completed")
+text_to_speech { text: "...", voiceId: "<voiceId>" }   → returns audioUrl
+```
+
+If `list_voices` is empty: first `save_voice` from a 10-60s audio sample of the user, then `text_to_speech`.
+
+**4. Add subtitles to a video (optionally translated)**
+
+```
+get_upload_url + curl upload (or use a direct file URL)
+caption_video { fileId: "<fileId>", translateTo: "en", dryRun: true }   → show estimate
+caption_video { fileId: "<fileId>", translateTo: "en" }                 → returns jobId
+check_job { jobId }                      → repeat until completed
+```
+
+**5. Dub a video into another language (EXPENSIVE — always dryRun first)**
+
+```
+translate_video { targetLanguage: "es", fileId: "<fileId>", dryRun: true }   → show estimate, ASK THE USER
+translate_video { targetLanguage: "es", fileId: "<fileId>" }                 → returns jobId
+check_job { jobId }                      → repeat every 30s; may take 5-30 minutes
+```
+
+## Common mistakes (do NOT do this)
+
+- **Do not call a paid tool again while its job is `processing`.** Long processing is normal. Keep polling `check_job` with the same `jobId`.
+- **Do not re-upload the same file.** A `fileId` is valid for 48 hours — reuse it across calls.
+- **`dryRun: true` does not start anything.** After showing the estimate, call the same tool again without `dryRun` to actually start.
+- **Do not retry on `insufficient_balance`.** Tell the user to top up in the VocaLingo app and stop.
+- **Do not pass YouTube links to `translate_video` or `caption_video`** — they need a direct video file (`fileId` or a direct `.mp4` URL). Platform links only work in `summarize_media`.
+- **Do not loop on language variants.** If a language is rejected, the error lists supported ones — pick from that list.
+
+---
+
 ## Files
 
 ### `get_upload_url` — free
@@ -47,16 +107,26 @@ Only clone voices you own or have explicit consent to use.
 
 Lists saved voices with `voiceId`, name, language, status.
 
-### `text_to_speech` — paid (~10 credits per 1000 chars)
+### `text_to_speech` — paid (~10 credits per 1000 chars with minimax)
 
-Converts text to speech. Returns an mp3 URL.
+Converts text to speech. Returns an audio URL. Three providers:
+
+| Provider | When to use | Text limit |
+|---|---|---|
+| `minimax` (default) | The **only** provider with the user's saved cloned voices | 30 000 chars |
+| `openai` | Natural voices, free-form style `instructions` | 4 000 chars |
+| `elevenlabs` | High-quality multilingual voices | 10 000 chars |
 
 | Param | Type | Description |
 |---|---|---|
-| `text` | string | Up to 30 000 chars (auto-chunked and merged) |
-| `voiceId` | string? | From `list_voices`; default — the latest saved voice, else a system voice |
-| `speed` | number? | 0.5–2.0 |
-| `emotion` | string? | e.g. `happy`, `sad`, `angry`, `neutral` |
+| `text` | string | Text to speak |
+| `provider` | string? | `minimax` (default) / `openai` / `elevenlabs` |
+| `voiceId` | string? | minimax: id from `list_voices` (default — the latest saved voice, else a system voice); openai: `cedar`, `marin`, `alloy`, `nova`, ... (default `cedar`); elevenlabs: an ElevenLabs voice id (default George) |
+| `speed` | number? | minimax 0.5–2.0, elevenlabs 0.7–1.2. Ignored for openai |
+| `emotion` | string? | minimax only: `happy`, `sad`, `angry`, `neutral`, ... |
+| `instructions` | string? | openai only: free-form style, e.g. `"calm and slow, like a bedtime story"` |
+
+To speak with the **user's own voice**, use `provider: "minimax"` (or just omit `provider`) + `voiceId` from `list_voices`.
 
 ---
 
@@ -83,6 +153,8 @@ Translates audio into another language: transcription → translation → option
 | `dryRun` | bool? | Cost estimate only |
 
 Result (via `check_job`): transcript, translated text, summary, and — with a voice mode — a translated audio URL.
+
+Cloning cost depends on the **target language**: for `en, ru, zh, de, fr, es, it, ja, ko, pt` a cheap cloning provider is used (a few credits); for other languages cloning costs ~150 credits extra. `dryRun` always returns the exact estimate — check it first.
 
 ---
 

@@ -9,7 +9,7 @@ Works with Claude Code, Cursor, Claude Desktop, Claude.ai, OpenClaw, Hermes and 
 ## What your agent can do
 
 - 🎤 **Save your voice** from a short audio sample and use it anywhere (`save_voice`, `list_voices`)
-- 🗣️ **Voice any text with your voice** — or a default one (`text_to_speech`)
+- 🗣️ **Voice any text with your voice** — or OpenAI / ElevenLabs voices (`text_to_speech`)
 - 🌍 **Translate audio with your voice preserved** — a voice message in Spanish becomes the same voice speaking English (`translate_audio`)
 - 🎬 **Dub videos into another language** with voice cloning and lip-sync (`translate_video`)
 - 💬 **Burn subtitles into videos**, optionally translated — a cheap alternative to dubbing (`caption_video`)
@@ -85,7 +85,7 @@ See [docs/tools.md](docs/tools.md) for the full reference of all 14 tools with p
 | `get_upload_url` | free | Presigned URL to upload a local file, returns `fileId` |
 | `save_voice` | paid | Clone a voice from audio (fileId/url) → saved voice |
 | `list_voices` | free | List saved voices |
-| `text_to_speech` | paid | Text → mp3 with your saved voice or a default one |
+| `text_to_speech` | paid | Text → speech: your saved voice (MiniMax), OpenAI or ElevenLabs voices |
 | `speech_to_text` | paid | Audio → text + detected language |
 | `translate_audio` | paid, job | Translate audio; voice: clone / saved / none |
 | `summarize_media` | paid, job | Video/audio (URL or file) → transcript + structured summary |
