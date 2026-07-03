@@ -92,7 +92,7 @@ Typical costs (anchors, actual cost depends on length and settings):
 | Transcribe a voice message (`speech_to_text`) | ~1 credit per 2 min |
 | Summarize a 10-min YouTube video (`summarize_media`) | ~4 credits |
 | Voice 1000 characters of text (`text_to_speech`, minimax) | ~10 credits |
-| Translate a 1-min voice message with voice cloning (`translate_audio`) | ~2–3 credits (+~150 one-time if the target language needs the premium cloning provider) |
+| Translate a 1-min voice message with Qwen auto-clone (`translate_audio`, default) | ~2–3 credits (+~150 one-time if target language needs MiniMax auto-clone) |
 | Save a voice (`save_voice`) | ~150 credits one-time |
 | Subtitles for a 5-min video (`caption_video`) | ~5–10 credits |
 | Dub a 5-min video (`translate_video`) | ~1100 credits — expensive, always confirm first |
@@ -114,7 +114,7 @@ See [docs/tools.md](docs/tools.md) for the full reference of all 16 tools with p
 | `delete_voice` | free | Permanently delete a saved voice |
 | `text_to_speech` | paid | Text → speech: your saved voice (MiniMax), OpenAI or ElevenLabs voices |
 | `speech_to_text` | paid | Audio → text + detected language |
-| `translate_audio` | paid, job | Translate audio; voice: clone / saved / none |
+| `translate_audio` | paid, job | Translate audio; default auto-clone (Qwen/MiniMax) / saved / none |
 | `summarize_media` | paid, job | Video/audio (URL or file) → transcript + structured summary |
 | `translate_video` | paid, job | Dub a video into another language (voice clone + lip-sync) |
 | `caption_video` | paid, job | Burn styled subtitles, optionally translated |

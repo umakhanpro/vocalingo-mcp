@@ -33,12 +33,12 @@ No upload step needed — the server downloads platform links itself.
 get_upload_url { filename: "voice.ogg" } → returns fileId + uploadUrl + curl example
 <run the curl command to upload the file>
 check_upload { fileId }                  → verify uploaded: true
-translate_audio { targetLanguage: "en", fileId: "<fileId>", voiceMode: "clone", dryRun: true }  → show estimate
-translate_audio { targetLanguage: "en", fileId: "<fileId>", voiceMode: "clone" }                → returns jobId
+translate_audio { targetLanguage: "en", fileId: "<fileId>", dryRun: true }  → show estimate
+translate_audio { targetLanguage: "en", fileId: "<fileId>" }                → returns jobId (auto-clone is default)
 check_job { jobId }                      → repeat until completed
 ```
 
-`voiceMode: "clone"` is a one-off clone from this audio — it does **not** save the voice. To keep a reusable voice, use `save_voice` once, then `voiceMode: "saved"`.
+`voiceMode: "clone"` is the **default** (auto-clone): clones the speaker from this audio for a one-off voice-over — it does **not** save the voice. Qwen auto-clone for `en, ru, zh, de, fr, es, it, ja, ko, pt` (min 3s, cheap). Other target languages use MiniMax auto-clone (min 10s, ~150 credits extra). Use `voiceMode: "none"` for text-only, or `voiceMode: "saved"` with a voice from `save_voice`.
 
 **3. Read a text aloud with the user's own voice**
 
@@ -175,13 +175,13 @@ Translates audio into another language: transcription → translation → option
 |---|---|---|
 | `targetLanguage` | string | Target language |
 | `fileId` / `url` | string | Source audio |
-| `voiceMode` | string? | `clone` — one-off clone of the speaker's voice from **this** audio (not saved for reuse; sample min 3 sec, or 10 sec for languages outside the cheap-provider list below); `saved` — use a voice saved earlier via `save_voice`; `none` (default) — text only |
+| `voiceMode` | string? | `clone` (**default**, auto-clone) — one-off clone of the speaker's voice from **this** audio (not saved; Qwen for `en, ru, zh, de, fr, es, it, ja, ko, pt`, min 3s; MiniMax for other languages, min 10s, ~150 credits extra); `saved` — voice from `save_voice`; `none` — text only |
 | `savedVoiceId` | string? | Required when `voiceMode: "saved"` |
 | `dryRun` | bool? | Cost estimate only |
 
-Result (via `check_job`): transcript, translated text, summary, and — with a voice mode — a translated audio URL.
+Result (via `check_job`): transcript, translated text, summary, and — unless `voiceMode: "none"` — a translated audio URL with auto-cloned voice.
 
-Cloning cost depends on the **target language**: for `en, ru, zh, de, fr, es, it, ja, ko, pt` a cheap cloning provider is used (a few credits); for other languages cloning costs ~150 credits extra. `dryRun` always returns the exact estimate — check it first.
+Auto-clone provider depends on **target language**: Qwen for `en, ru, zh, de, fr, es, it, ja, ko, pt` (a few credits); MiniMax for other languages (~150 credits extra). `dryRun` always returns the exact estimate — check it first.
 
 ---
 
