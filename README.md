@@ -136,7 +136,7 @@ See [docs/tools.md](docs/tools.md) for the full reference of all 16 tools with p
 
 - **Claude Desktop: can't find where to enter the token.** The connector UI has no header field — use the `mcp-remote` config above ([full guide](configs/claude-desktop.md)) and fully restart the app.
 - **File upload fails with a network error in Claude's sandbox.** Whitelist `sb.vocalingo.app` (Settings → Capabilities → Code execution → Additional allowed domains), or use the `browserUploadUrl` returned by `get_upload_url` and drop the file in the browser.
-- **A job stays `processing` for a long time.** That's normal: dubbing takes 5–30 min, translations a few minutes. Keep polling `check_job` with the same `jobId` — never restart the job. You can also close the chat: the job continues on the server, results appear in the app history and via `list_jobs`.
+- **A job stays `processing` for a long time.** That's normal: dubbing takes 5–30 min, translations a few minutes. Keep calling `check_job` with the same `jobId` (it waits up to 20 s per call) — never restart the job. You can also close the chat: the job continues on the server, results appear in the app history and via `list_jobs`.
 - **A result link has expired.** Media links are valid for 24 hours. Call `check_job` with the same `jobId` — it returns a fresh link. Results are also stored permanently in the app history.
 - **`insufficient_balance` error.** The response includes how many credits are required vs available. Top up in the VocaLingo app (Profile → Balance) and retry.
 - **`429 rate limit`.** Max 60 requests/min per token and 3 concurrent jobs. Wait a minute; if two agents share your token, they share the limit too.

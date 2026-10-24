@@ -7,7 +7,7 @@ Conventions:
 - **Credits**: the same tokens you see in the VocaLingo app, spent from the same balance ("credits" and "tokens" are the same unit).
 - **`fileId`**: returned by `get_upload_url` after the agent uploads a local file.
 - **`url`**: a direct public link the server downloads itself (SSRF-protected).
-- **Job tools** return a `jobId` immediately; poll `check_job` until `status` is `completed` or `failed`.
+- **Job tools** return a `jobId` immediately. `check_job` waits on the server up to `waitSeconds` (default 20 s, max 45 s) and returns as soon as the job finishes — while `status` is `processing`, just call it again. No sleeping between calls.
 - **Languages**: tools accept ISO codes (`es`), English names (`Spanish`) and native names (`Español`).
 - **`dryRun: true`**: paid tools return a cost estimate without starting or charging.
 - **Result links** (audio/video URLs) are signed for 24 hours. Expired? Call `check_job` with the same `jobId` for a fresh link — results are stored permanently in the app history.
@@ -22,7 +22,7 @@ Follow these step by step. Do not add extra calls.
 
 ```
 summarize_media { url: "<link>" }        → returns jobId
-check_job { jobId }                      → repeat every 10-30s until completed
+check_job { jobId }                      → waits up to 20s; call again while "processing"
 ```
 
 No upload step needed — the server downloads platform links itself.
@@ -35,7 +35,7 @@ get_upload_url { filename: "voice.ogg" } → returns fileId + uploadUrl + curl e
 check_upload { fileId }                  → verify uploaded: true
 translate_audio { targetLanguage: "en", fileId: "<fileId>", dryRun: true }  → show estimate
 translate_audio { targetLanguage: "en", fileId: "<fileId>" }                → returns jobId (auto-clone is default)
-check_job { jobId }                      → repeat until completed
+check_job { jobId }                      → call again while "processing"
 ```
 
 `voiceMode: "clone"` is the **default** (auto-clone): clones the speaker from this audio for a one-off voice-over — it does **not** save the voice. Qwen auto-clone for `en, ru, zh, de, fr, es, it, ja, ko, pt` (min 3s, cheap). Other target languages use MiniMax auto-clone (min 10s, ~150 credits extra). Use `voiceMode: "none"` for text-only, or `voiceMode: "saved"` with a voice from `save_voice`.
@@ -55,7 +55,7 @@ If `list_voices` is empty: first `save_voice` from a 10-60s audio sample of the 
 get_upload_url + curl upload + check_upload (or use a direct file URL)
 caption_video { fileId: "<fileId>", translateTo: "en", dryRun: true }   → show estimate
 caption_video { fileId: "<fileId>", translateTo: "en" }                 → returns jobId
-check_job { jobId }                      → repeat until completed
+check_job { jobId }                      → call again while "processing"
 ```
 
 **5. Dub a video into another language (EXPENSIVE — always dryRun first)**
@@ -63,12 +63,12 @@ check_job { jobId }                      → repeat until completed
 ```
 translate_video { targetLanguage: "es", fileId: "<fileId>", dryRun: true }   → show estimate, ASK THE USER
 translate_video { targetLanguage: "es", fileId: "<fileId>" }                 → returns jobId
-check_job { jobId }                      → repeat every 30s; may take 5-30 minutes
+check_job { jobId }                      → call again while "processing"; may take 5-30 minutes
 ```
 
 ## Common mistakes (do NOT do this)
 
-- **Do not call a paid tool again while its job is `processing`.** Long processing is normal. Keep polling `check_job` with the same `jobId`.
+- **Do not call a paid tool again while its job is `processing`.** Long processing is normal. Keep calling `check_job` with the same `jobId`.
 - **Do not re-upload the same file.** A `fileId` is valid for 48 hours — reuse it across calls.
 - **`dryRun: true` does not start anything.** After showing the estimate, call the same tool again without `dryRun` to actually start.
 - **Do not retry on `insufficient_balance`.** Tell the user to top up in the VocaLingo app and stop.
@@ -109,7 +109,7 @@ Returns `uploaded: true/false` and the file size. If `false` right after a brows
 
 ### `save_voice` — paid (~150 credits)
 
-Clones a voice from an audio sample and saves it to the account. Waits for completion (~1 min).
+Clones a voice from an audio sample and saves it to the account. Usually finishes in ~10 s and returns `voiceId`; if it takes longer, returns a `jobId` for `check_job` (do not call `save_voice` again).
 
 | Param | Type | Description |
 |---|---|---|
@@ -234,8 +234,9 @@ Burns styled subtitles into a video; optionally translates them (a cheap alterna
 | Param | Type | Description |
 |---|---|---|
 | `jobId` | string | From any job tool (`va_…`, `sm_…`, `dl_…`, `tv_…`, `cv_…`, `vc_…`) |
+| `waitSeconds` | int? | How long to wait for completion before returning (default 20, max 45; 0 = return immediately) |
 
-Returns status, progress/stages, result (text + signed media URLs) or a human-readable error. Poll every 10–30 seconds. Media URLs are signed for 24 hours — if a link expired, call `check_job` again with the same `jobId` for a fresh one.
+Returns status, progress/stages, result (text + signed media URLs) or a human-readable error. Waits on the server up to `waitSeconds` and returns early when the job finishes; while `processing`, the response includes a `nextStep` hint. Media URLs are signed for 24 hours — if a link expired, call `check_job` again with the same `jobId` for a fresh one.
 
 ### `list_jobs` — free
 
