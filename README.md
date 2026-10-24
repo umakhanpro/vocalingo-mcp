@@ -86,24 +86,24 @@ Only need the text on a photo read or translated? Claude and ChatGPT can do that
 
 ## Pricing and safety
 
-Tools spend credits from your VocaLingo balance — the same tokens as in the app. No separate API billing.
+Tools spend VocaLingo tokens from your balance, the same tokens as in the app. No separate API billing.
 
 | Operation | Approximate cost |
 |---|---|
-| Transcribe a voice message | ~1 credit per 2 min |
-| Summarize a 10-min video | ~4 credits |
-| Translate a 1-min voice message in the same voice | ~2–3 credits (+150 for languages outside en, ru, zh, de, fr, es, it, ja, ko, pt) |
-| Voice 1000 characters in your voice | ~9–10 credits |
-| Save a voice | ~1 credit |
-| Translate a photo | 4–6 credits |
-| Change the voice in a 1-min recording | ~12 credits |
+| Transcribe a voice message | ~1 token per 2 min |
+| Summarize a 10-min video | ~4 tokens |
+| Translate a 1-min voice message in the same voice | ~2–3 tokens (+150 for languages outside en, ru, zh, de, fr, es, it, ja, ko, pt) |
+| Voice 1000 characters in your voice | ~9–10 tokens |
+| Save a voice | ~1 token |
+| Translate a photo | 4–6 tokens |
+| Change the voice in a 1-min recording | ~12 tokens |
 | Download a video or audio | free |
-| Subtitles for a 5-min video | ~5–10 credits |
-| Dub a 5-min video | ~1100 credits |
+| Subtitles for a 5-min video | ~5–10 tokens |
+| Dub a 5-min video | ~1100 tokens |
 
 Built so that even a small model can't burn your balance:
 
-- **Anything that costs 50+ credits asks you first.** The server returns the price and a one-time `confirmToken`; the job starts only when the agent repeats the call with it.
+- **Anything that costs 50+ tokens asks you first.** The server returns the price and a one-time `confirmToken`; the job starts only when the agent repeats the call with it.
 - **No double charges.** Repeating the same paid request within 10 minutes returns the same job.
 - **Long jobs don't need babysitting.** Short ones come back finished in the same call; long ones return a `jobId`, and `check_job` waits on the server.
 - **Errors say what to do next** (`code` + `nextStep`), e.g. "this is a local path — upload it first".

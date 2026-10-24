@@ -7,8 +7,8 @@ Conventions:
 - **`source`** — every tool that takes a file has one `source` parameter: either a **fileId** from `get_upload_url` or a **public https link** (YouTube/TikTok/Instagram for `summarize_media` and `download_media`, a Telegram Bot API file link, any direct file URL). A local path like `/Users/me/voice.ogg` is rejected with instructions to upload it first.
 - **`file`** (ChatGPT) — the same tools declare `_meta["openai/fileParams"]: ["file"]`, so a file the user attached in ChatGPT arrives as `{ download_url, file_id, mime_type, file_name }` and `source` can be omitted. The server imports it once per `file_id`.
 - **Upload button** — `get_upload_url` carries an MCP App (`ui://vocalingo/upload-file`). Hosts that support MCP Apps (claude.ai, Claude apps, ChatGPT) show a file picker under the call; after the upload it posts a chat message with the `fileId`. Clients without MCP Apps use `curlCommand` or `browserUploadUrl` as before.
-- **Credits** — the same tokens you see in the VocaLingo app, spent from the same balance.
-- **Confirmation** — a call that would cost **50+ credits** does not start. It returns `status: "confirmation_required"` with the price and a `confirmToken`. The agent asks you; if you agree, it repeats the same call with `confirmToken`. A token is bound to your account and to those exact arguments, valid 30 minutes.
+- **Tokens** — VocaLingo tokens, the in-app currency you see in the app (not LLM tokens), spent from the same balance.
+- **Confirmation** — a call that would cost **50+ tokens** does not start. It returns `status: "confirmation_required"` with the price and a `confirmToken`. The agent asks you; if you agree, it repeats the same call with `confirmToken`. A token is bound to your account and to those exact arguments, valid 30 minutes.
 - **`dryRun: true`** — returns only the estimate (plus a `confirmToken` for expensive calls); nothing starts.
 - **No double charges** — an identical paid call repeated within 10 minutes returns the same job / result instead of running again.
 - **Jobs** — long tools wait ~25 s and return the result if it's ready; otherwise they return a `jobId`. `check_job` then waits up to `waitSeconds` (default 20, max 45) per call. While `status` is `processing`, just call it again.
@@ -36,7 +36,7 @@ translate_audio { source: "<fileId>", targetLanguage: "en" }
    → or { jobId, status: "processing" } → check_job { jobId }
 ```
 
-`voice` defaults to `"clone"` — a one-off clone of the speaker from this audio, nothing is saved. Cheap for en, ru, zh, de, fr, es, it, ja, ko, pt (min 3 s of speech). Other target languages use MiniMax (min 10 s, ~150 credits extra) → you'll get `confirmation_required` first. `voice: "none"` = text only; a `voiceId` from `list_voices` = that saved voice.
+`voice` defaults to `"clone"` — a one-off clone of the speaker from this audio, nothing is saved. Cheap for en, ru, zh, de, fr, es, it, ja, ko, pt (min 3 s of speech). Other target languages use MiniMax (min 10 s, ~150 tokens extra) → you'll get `confirmation_required` first. `voice: "none"` = text only; a `voiceId` from `list_voices` = that saved voice.
 
 **Summarize a YouTube / TikTok / Instagram video**
 
@@ -53,7 +53,7 @@ list_voices {}                                            → pick voiceId
 text_to_speech { text: "…", voice: "<voiceId>" }          → { audioUrl }
 ```
 
-No saved voice? `save_voice { name, source }` with a 10–60 s sample (~1 credit, the voice also appears in the app). Own voices speak en, ru, zh, de, fr, es, it, ja, ko, pt.
+No saved voice? `save_voice { name, source }` with a 10–60 s sample (~1 token, the voice also appears in the app). Own voices speak en, ru, zh, de, fr, es, it, ja, ko, pt.
 
 **Subtitles / dubbing (also for a YouTube/TikTok link)**
 
@@ -112,7 +112,7 @@ There is no separate "check upload" step: if the file hasn't arrived yet, the to
 
 ## Voice
 
-### `save_voice` — paid (~1 credit)
+### `save_voice` — paid (~1 token)
 
 Clones a voice from 10–60 s of clean speech and saves it to the same library as the app (longer audio is trimmed). Takes ~10–30 s. The voice speaks en, ru, zh, de, fr, es, it, ja, ko, pt.
 
@@ -135,7 +135,7 @@ Only clone voices you own or have explicit consent to use.
 |---|---|---|
 | `voiceId` | string | From `list_voices` |
 
-Irreversible; clone credits are not refunded.
+Irreversible; tokens spent on the clone are not refunded.
 
 ### `text_to_speech` — paid
 
@@ -157,15 +157,15 @@ Voices a text and returns `audioUrl`. The provider is picked from `voice`:
 | `instructions` | string? | OpenAI: free-form style, e.g. `"calm and slow"` |
 | `language` | string? | Language of the text; helps your own voice pronounce it right |
 | `dryRun` | bool? | Estimate only |
-| `confirmToken` | string? | For runs of 50+ credits |
+| `confirmToken` | string? | For runs of 50+ tokens |
 
-~9–10 credits per 1000 characters with your own voice. Long texts may come back as `status: "processing"` + `jobId`.
+~9–10 tokens per 1000 characters with your own voice. Long texts may come back as `status: "processing"` + `jobId`.
 
 ---
 
 ## Speech & audio
 
-### `speech_to_text` — paid (~1 credit per 2 min)
+### `speech_to_text` — paid (~1 token per 2 min)
 
 | Param | Type | Description |
 |---|---|---|
@@ -184,7 +184,7 @@ Transcript → translation → summary → (by default) voice-over in the speake
 | `targetLanguage` | string | Target language |
 | `voice` | string? | `"clone"` (default), `"none"` (text only) or a `voiceId` |
 | `dryRun` | bool? | Estimate only |
-| `confirmToken` | string? | For runs of 50+ credits (e.g. MiniMax clone) |
+| `confirmToken` | string? | For runs of 50+ tokens (e.g. MiniMax clone) |
 
 Result (directly or via `check_job`): `transcript`, `translatedText`, `summary`, `translatedAudioUrl`, `stages`.
 
@@ -192,18 +192,18 @@ Result (directly or via `check_job`): `transcript`, `translatedText`, `summary`,
 
 ## Video
 
-### `summarize_media` — paid (~0.42 credits/min)
+### `summarize_media` — paid (~0.42 tokens/min)
 
 | Param | Type | Description |
 |---|---|---|
 | `source` | string | YouTube/TikTok/Instagram/X/Vimeo link, direct media URL, or fileId |
 | `summaryLanguage` | string? | Summary language (default — your app language) |
 | `dryRun` | bool? | Estimate only |
-| `confirmToken` | string? | For very long uploads (50+ credits) |
+| `confirmToken` | string? | For very long uploads (50+ tokens) |
 
 Result: title, structured summary (content type, key moments with timecodes, verbatim quotes, takeaway, chapters; Q&A, terms or action items depending on content), a transcript preview, and — via `check_job` `include` — the full transcript and timecoded segments.
 
-### `translate_video` — paid (~220 credits/min, confirmed)
+### `translate_video` — paid (~220 tokens/min, confirmed)
 
 Dubbing with voice cloning and optional lip-sync. Needs the video **file**. Max 30 minutes; takes 5–30 minutes.
 
@@ -215,7 +215,7 @@ Dubbing with voice cloning and optional lip-sync. Needs the video **file**. Max 
 | `dryRun` | bool? | Estimate only |
 | `confirmToken` | string? | From `confirmation_required` |
 
-### `caption_video` — paid (~1–2 credits/min)
+### `caption_video` — paid (~1–2 tokens/min)
 
 | Param | Type | Description |
 |---|---|---|
@@ -223,7 +223,7 @@ Dubbing with voice cloning and optional lip-sync. Needs the video **file**. Max 
 | `targetLanguage` | string? | Translate the subtitles; omit for the original language |
 | `style` | string? | `classic-outline` (default), `tiktok-bold`, `boxed`, `minimal`, `cinematic-top`, `neon-cyan`, `yellow-pop`, `subtitle-pill`, `red-punch`, `premium-gold` |
 | `dryRun` | bool? | Estimate only |
-| `confirmToken` | string? | For long videos (50+ credits) |
+| `confirmToken` | string? | For long videos (50+ tokens) |
 
 ### `download_media` — free (needs a positive balance)
 
@@ -244,11 +244,11 @@ Re-voices speech in an audio or video file (up to 5 min) into an ElevenLabs stoc
 | `source` | string | fileId or direct link to the audio/video (max 100 MB) |
 | `voice` | string | ElevenLabs voice name (`George`) or `voiceId` from `list_voices` |
 | `dryRun` | bool? | Estimate only |
-| `confirmToken` | string? | For runs of 50+ credits |
+| `confirmToken` | string? | For runs of 50+ tokens |
 
-### `translate_image` — paid (4–6 credits)
+### `translate_image` — paid (4–6 tokens)
 
-Redraws all text on an image (menu, sign, document, poster, screenshot) in another language, keeping layout, fonts and colors. Takes ~20–40 s. Returns `imageUrl` (valid 7 days).
+Redraws all text on an image (menu, sign, document, poster, screenshot) in another language, keeping layout, fonts and colors. Takes ~20–40 s. Returns `imageUrl` (valid 7 days) plus a compressed preview as image content, so the agent can check the text. Hosts with MCP Apps (claude.ai, Claude apps, ChatGPT) show the image right in the chat with Save and Open buttons (`ui://vocalingo/image-result`).
 
 | Param | Type | Description |
 |---|---|---|
