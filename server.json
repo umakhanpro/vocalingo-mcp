@@ -1,0 +1,18 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.umakhanpro/vocalingo",
+  "title": "VocaLingo",
+  "description": "Summarize videos, transcribe and translate voice messages keeping the speaker's voice, speak in your own cloned voice, subtitles and dubbing.",
+  "version": "2.0.0",
+  "websiteUrl": "https://vocalingo.app",
+  "repository": {
+    "url": "https://github.com/umakhanpro/vocalingo-mcp",
+    "source": "github"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://nodejs.vocalingo.app/mcp"
+    }
+  ]
+}
