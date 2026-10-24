@@ -11,11 +11,14 @@ Works with claude.ai, Claude Desktop, Claude Code, ChatGPT, Cursor, Windsurf, VS
 - 📝 **Watch videos for you** — summary, key moments with timecodes, quotes, full transcript of a YouTube/TikTok/Instagram link or a file (`summarize_media`)
 - 🎧 **Understand voice messages** — speech → text (`speech_to_text`)
 - 🌍 **Translate speech in the same voice** — a voice message in Spanish becomes the same voice speaking English (`translate_audio`)
-- 🗣️ **Speak in your voice** — save your voice once, then voice any text with it, or use OpenAI / ElevenLabs voices (`save_voice`, `list_voices`, `text_to_speech`)
+- 🗣️ **Speak in your voice** — the voices you saved in the app work right away, or save a new one; also OpenAI / ElevenLabs voices (`list_voices`, `text_to_speech`, `save_voice`)
+- ⬇️ **Download a video or its mp3** from YouTube, TikTok, Instagram and more (`download_media`)
+- 🎭 **Change the voice** in a recording or video (`change_voice`)
+- 🖼️ **Translate a photo of a menu, sign or document** as an image (`translate_image`)
 - 💬 **Subtitles**, optionally translated (`caption_video`) and 🎬 **dubbing** with lip-sync (`translate_video`)
 - 💳 Job status and account (`check_job`, `get_account`)
 
-12 tools in total — [full reference](docs/tools.md).
+[Full reference](docs/tools.md).
 
 ## Connect
 
@@ -57,7 +60,9 @@ The token is in the app: **Settings → API / MCP Token**. More snippets (incl. 
 - *"Summarize this YouTube lecture in Russian: <link>"*
 - *"Here's a voice message in German — translate it to English keeping the voice."*
 - *"Save my voice from this recording, then read this article aloud with it."*
-- *"Add English subtitles to this video."*
+- *"Add English subtitles to this TikTok: <link>"*
+- *"Download the audio of this YouTube video."*
+- *"Translate this menu photo into English."*
 - *"Dub this video into Spanish."*
 
 ## Files
@@ -77,8 +82,11 @@ Tools spend credits from your VocaLingo balance — the same tokens as in the ap
 | Transcribe a voice message | ~1 credit per 2 min |
 | Summarize a 10-min video | ~4 credits |
 | Translate a 1-min voice message in the same voice | ~2–3 credits (+150 for languages outside en, ru, zh, de, fr, es, it, ja, ko, pt) |
-| Voice 1000 characters in your voice | ~10 credits |
-| Save a voice | 150 credits |
+| Voice 1000 characters in your voice | ~9–10 credits |
+| Save a voice | ~1 credit |
+| Translate a photo | 4–6 credits |
+| Change the voice in a 1-min recording | ~12 credits |
+| Download a video or audio | free |
 | Subtitles for a 5-min video | ~5–10 credits |
 | Dub a 5-min video | ~1100 credits |
 

@@ -1,10 +1,10 @@
 # VocaLingo MCP — Tools Reference
 
-All 12 tools of the VocaLingo MCP server (`https://nodejs.vocalingo.app/mcp`).
+All 15 tools of the VocaLingo MCP server (`https://nodejs.vocalingo.app/mcp`).
 
 Conventions:
 
-- **`source`** — every tool that takes a file has one `source` parameter: either a **fileId** from `get_upload_url` or a **public https link** (YouTube/TikTok/Instagram for `summarize_media`, a Telegram Bot API file link, any direct file URL). A local path like `/Users/me/voice.ogg` is rejected with instructions to upload it first.
+- **`source`** — every tool that takes a file has one `source` parameter: either a **fileId** from `get_upload_url` or a **public https link** (YouTube/TikTok/Instagram for `summarize_media` and `download_media`, a Telegram Bot API file link, any direct file URL). A local path like `/Users/me/voice.ogg` is rejected with instructions to upload it first.
 - **Credits** — the same tokens you see in the VocaLingo app, spent from the same balance.
 - **Confirmation** — a call that would cost **50+ credits** does not start. It returns `status: "confirmation_required"` with the price and a `confirmToken`. The agent asks you; if you agree, it repeats the same call with `confirmToken`. A token is bound to your account and to those exact arguments, valid 30 minutes.
 - **`dryRun: true`** — returns only the estimate (plus a `confirmToken` for expensive calls); nothing starts.
@@ -51,20 +51,40 @@ list_voices {}                                            → pick voiceId
 text_to_speech { text: "…", voice: "<voiceId>" }          → { audioUrl }
 ```
 
-No saved voice? `save_voice { name, source }` with a 10–60 s sample (150 credits → confirmation first).
+No saved voice? `save_voice { name, source }` with a 10–60 s sample (~1 credit, the voice also appears in the app). Own voices speak en, ru, zh, de, fr, es, it, ja, ko, pt.
 
-**Subtitles / dubbing**
+**Subtitles / dubbing (also for a YouTube/TikTok link)**
 
 ```
-caption_video { source: "<fileId>", targetLanguage: "en" }       → jobId → check_job
-translate_video { source: "<fileId>", targetLanguage: "es" }     → confirmation_required → (after you agree) jobId → check_job
+download_media { source: "https://youtu.be/…" }                   → { source: "<file link>" }   (skip for an uploaded file)
+caption_video { source: "<file>", targetLanguage: "en" }          → jobId → check_job
+translate_video { source: "<file>", targetLanguage: "es" }        → confirmation_required → (after you agree) jobId → check_job
+```
+
+**Download a video or its audio**
+
+```
+download_media { source: "<link>", kind: "audio" }                → { fileUrl }   (mp3; kind "video" → mp4)
+```
+
+**Another voice for a recording**
+
+```
+list_voices {}                                                    → stockVoices.elevenlabs
+change_voice { source: "<fileId or link>", voice: "George" }      → { resultUrl }
+```
+
+**Translate a menu / sign / document photo as an image**
+
+```
+translate_image { source: "<image fileId or link>", targetLanguage: "en" }   → { imageUrl }
 ```
 
 ## Don't
 
 - **Don't start the same paid job again** while it's `processing` — keep calling `check_job` with the same `jobId`. (A repeat within 10 minutes just returns the same job anyway.)
 - **Don't re-upload** the same file: a `fileId` is valid for 48 hours.
-- **Don't pass YouTube/TikTok links to `translate_video` / `caption_video`** — they need the video file. Platform links work in `summarize_media`.
+- **Don't pass YouTube/TikTok links to `translate_video` / `caption_video` / `change_voice`** — they need the file: call `download_media` first. Platform links work directly in `summarize_media`.
 - **Don't confirm a cost on the user's behalf.**
 - **Don't retry on `insufficient_balance`** — top up in the app first.
 
@@ -82,7 +102,7 @@ Creates an upload slot for a local file.
 
 Returns `fileId`, a ready `curlCommand` (PUT), `uploadUrl` (expires in ~2 h), and `browserUploadUrl` — a drag&drop page for users without a shell. Uploaded files are deleted after 48 hours.
 
-Size limits: `translate_audio` 150 MB; `speech_to_text` and `save_voice` 50 MB; video tools 100 MB. Extensions: mp3, m4a, wav, ogg, oga, opus, webm, aac, flac, mp4, mov, mkv, avi, m4v, mpeg, mpg.
+Size limits: `translate_audio` 150 MB; `speech_to_text` and `save_voice` 50 MB; video tools and `change_voice` 100 MB; images 20 MB. Extensions: mp3, m4a, wav, ogg, oga, opus, webm, aac, flac, mp4, mov, mkv, avi, m4v, mpeg, mpg, jpg, jpeg, png, webp.
 
 There is no separate "check upload" step: if the file hasn't arrived yet, the tool you call returns `code: "file_not_uploaded"` with what to do.
 
@@ -90,9 +110,9 @@ There is no separate "check upload" step: if the file hasn't arrived yet, the to
 
 ## Voice
 
-### `save_voice` — paid (150 credits, always confirmed)
+### `save_voice` — paid (~1 credit)
 
-Clones a voice from 10–60 s of clean speech and saves it to the library (longer audio is trimmed). Usually done in ~10 s; otherwise returns a `jobId` for `check_job`.
+Clones a voice from 10–60 s of clean speech and saves it to the same library as the app (longer audio is trimmed). Takes ~10–30 s. The voice speaks en, ru, zh, de, fr, es, it, ja, ko, pt.
 
 | Param | Type | Description |
 |---|---|---|
@@ -100,13 +120,12 @@ Clones a voice from 10–60 s of clean speech and saves it to the library (longe
 | `source` | string | fileId or link to the sample |
 | `language` | string? | Sample language (improves quality) |
 | `dryRun` | bool? | Estimate only |
-| `confirmToken` | string? | From the `confirmation_required` response |
 
 Only clone voices you own or have explicit consent to use.
 
 ### `list_voices` — free
 
-Saved voices with `voiceId`, name, language, status and `usableInTextToSpeech`.
+`ownVoices` — the user's saved voices (`voiceId`, name, language, status, `usableInTextToSpeech`). `stockVoices` — OpenAI voice names and ElevenLabs stock voices (`voiceId`, name, gender, accent, style) for `text_to_speech` and `change_voice`.
 
 ### `delete_voice` — free, destructive
 
@@ -122,9 +141,9 @@ Voices a text and returns `audioUrl`. The provider is picked from `voice`:
 
 | `voice` | Provider | Text limit |
 |---|---|---|
-| a `voiceId` from `list_voices`, or omitted (your latest saved voice, else a stock narrator) | MiniMax — **your own voice** | 30 000 chars |
+| a `voiceId` from `list_voices`, or omitted (your latest saved voice, else a stock narrator) | **your own voice** (en, ru, zh, de, fr, es, it, ja, ko, pt) | 10 000 chars |
 | `cedar`, `marin`, `alloy`, `ash`, `coral`, `echo`, `fable`, `nova`, `onyx`, `sage`, `shimmer` | OpenAI (supports `instructions`) | 4 000 chars |
-| a 20-character ElevenLabs voice id | ElevenLabs | 10 000 chars |
+| an ElevenLabs voice name (`George`) or id from `list_voices` | ElevenLabs | 10 000 chars |
 
 | Param | Type | Description |
 |---|---|---|
@@ -134,10 +153,11 @@ Voices a text and returns `audioUrl`. The provider is picked from `voice`:
 | `speed` | number? | 0.5–2.0 (own voices), 0.7–1.2 (ElevenLabs) |
 | `emotion` | string? | Own voices: `happy`, `sad`, `angry`, `neutral`, … |
 | `instructions` | string? | OpenAI: free-form style, e.g. `"calm and slow"` |
+| `language` | string? | Language of the text; helps your own voice pronounce it right |
 | `dryRun` | bool? | Estimate only |
 | `confirmToken` | string? | For runs of 50+ credits |
 
-~10 credits per 1000 characters with your own voice. Long texts may come back as `status: "processing"` + `jobId`.
+~9–10 credits per 1000 characters with your own voice. Long texts may come back as `status: "processing"` + `jobId`.
 
 ---
 
@@ -203,6 +223,37 @@ Dubbing with voice cloning and optional lip-sync. Needs the video **file**. Max 
 | `dryRun` | bool? | Estimate only |
 | `confirmToken` | string? | For long videos (50+ credits) |
 
+### `download_media` — free (needs a positive balance)
+
+Downloads a video (mp4) or its audio (mp3) from YouTube, TikTok, Instagram, X, Vimeo and most other sites. Returns `fileUrl` (valid 24 h) and the same link as `source` for other tools. Waits up to ~40 s, otherwise returns a `jobId`.
+
+| Param | Type | Description |
+|---|---|---|
+| `source` | string | Link to the video page or file |
+| `kind` | string? | `video` (default) or `audio` |
+| `quality` | string? | `360`, `480`, `720` (default), `1080` — video only; other tools accept files up to 100 MB |
+
+### `change_voice` — paid (by duration)
+
+Re-voices speech in an audio or video file (up to 5 min) into an ElevenLabs stock voice, keeping intonation and timing. Video keeps its picture; non-Premium videos get a small watermark. The user's own cloned voices are not supported here.
+
+| Param | Type | Description |
+|---|---|---|
+| `source` | string | fileId or direct link to the audio/video (max 100 MB) |
+| `voice` | string | ElevenLabs voice name (`George`) or `voiceId` from `list_voices` |
+| `dryRun` | bool? | Estimate only |
+| `confirmToken` | string? | For runs of 50+ credits |
+
+### `translate_image` — paid (4–6 credits)
+
+Redraws all text on an image (menu, sign, document, poster, screenshot) in another language, keeping layout, fonts and colors. Takes ~20–40 s. Returns `imageUrl` (valid 7 days).
+
+| Param | Type | Description |
+|---|---|---|
+| `source` | string | fileId (jpg, png, webp) or link to the image (max 20 MB) |
+| `targetLanguage` | string | Target language |
+| `dryRun` | bool? | Estimate only |
+
 ---
 
 ## Jobs & account
@@ -211,7 +262,7 @@ Dubbing with voice cloning and optional lip-sync. Needs the video **file**. Max 
 
 | Param | Type | Description |
 |---|---|---|
-| `jobId` | string? | From a job tool (`va_…`, `sm_…`, `dl_…`, `tv_…`, `cv_…`, `vc_…`, `ts_…`). **Omit to list recent jobs.** |
+| `jobId` | string? | From a job tool (`va_…`, `sm_…`, `dl_…`, `tv_…`, `cv_…`, `vx_…`, `ts_…`). **Omit to list recent jobs.** |
 | `waitSeconds` | int? | Wait for completion (default 20, max 45; 0 = return immediately) |
 | `include` | string? | For finished transcriptions: `summary` (default: summary + transcript preview), `transcript` (full text, paged), `segments` (timecodes, paged) |
 | `offset` | int? | Continue from `nextOffset` of the previous page |
@@ -238,6 +289,6 @@ Every error is `isError: true` with a machine-readable `code` and a `nextStep` f
   "nextStep": "Call get_upload_url, upload the file with the returned curl command (or give the user browserUploadUrl), then pass the returned fileId as source." }
 ```
 
-Common codes: `local_path`, `file_not_uploaded`, `file_too_large`, `not_a_media_file`, `platform_link_not_supported`, `unknown_language`, `invalid_voice`, `voice_not_found`, `audio_too_short`, `too_many_jobs`, `insufficient_balance`, `balance_unavailable` (temporary — retry in a minute), `internal_error`.
+Common codes: `local_path`, `file_not_uploaded`, `file_too_large`, `not_a_media_file`, `not_an_image`, `media_too_long`, `platform_link_not_supported`, `unknown_language`, `invalid_voice`, `voice_not_found`, `audio_too_short`, `too_many_jobs`, `insufficient_balance`, `balance_unavailable` (temporary — retry in a minute), `internal_error`.
 
 Rate limits: 60 requests/min per account; max 3 concurrent jobs.
