@@ -89,7 +89,7 @@ Creates a presigned upload URL for a local file.
 
 Returns `fileId`, `uploadUrl` (PUT, expires in ~2h), a ready `curlExample`, and `browserUploadUrl` — a drag&drop page for users without a shell. Files are deleted after 48 hours.
 
-Size limits by consuming tool: audio tools (`translate_audio`, `speech_to_text`, `save_voice`) accept up to **50 MB**; video tools (`summarize_media`, `translate_video`, `caption_video`) up to **100 MB**.
+Size limits by consuming tool: `translate_audio` up to **150 MB**; `speech_to_text` and `save_voice` up to **50 MB**; video tools (`summarize_media`, `translate_video`, `caption_video`) up to **100 MB**.
 
 Supported extensions: mp3, m4a, wav, ogg, oga, opus, webm, aac, flac, mp4, mov, mkv, avi, m4v, mpeg, mpg.
 
@@ -176,7 +176,7 @@ Translates audio into another language: transcription → translation → option
 | Param | Type | Description |
 |---|---|---|
 | `targetLanguage` | string | Target language |
-| `fileId` / `url` | string | Source audio |
+| `fileId` / `url` | string | Source audio (max 150 MB) |
 | `voiceMode` | string? | `clone` (**default**, auto-clone) — one-off clone of the speaker's voice from **this** audio (not saved; Qwen for `en, ru, zh, de, fr, es, it, ja, ko, pt`, min 3s; MiniMax for other languages, min 10s, ~150 credits extra); `saved` — voice from `save_voice`; `none` — text only |
 | `savedVoiceId` | string? | Required when `voiceMode: "saved"` |
 | `dryRun` | bool? | Cost estimate only |
@@ -199,7 +199,7 @@ Transcribes and summarizes a video or audio. Accepts platform links (YouTube, Ti
 | `outputLanguage` | string? | Language of the summary (default — your app language) |
 | `dryRun` | bool? | Cost estimate only |
 
-Result: title, structured summary (key moments, quotes, takeaway), full transcript and timecoded segments (SRT-compatible).
+Result: title, structured summary (content type, key moments with timecodes, quotes with the verbatim original, takeaway, chapters and, depending on the content, Q&A pairs, terms or action items), full transcript and timecoded segments (SRT-compatible).
 
 ### `translate_video` — paid, job (~220 credits/min — EXPENSIVE)
 
