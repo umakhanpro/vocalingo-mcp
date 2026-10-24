@@ -22,11 +22,19 @@ Works with claude.ai, Claude Desktop, Claude Code, ChatGPT, Cursor, Windsurf, VS
 
 ## Connect
 
-### claude.ai, Claude Desktop, ChatGPT (sign in, no token)
+### claude.ai, Claude Desktop, Claude mobile (sign in, no token)
 
-1. Settings → **Connectors** → **Add custom connector** (ChatGPT: Settings → Apps & Connectors → Create).
-2. URL: `https://nodejs.vocalingo.app/mcp`
-3. Sign in with the email of your VocaLingo account and allow access.
+1. Open **[Add VocaLingo to Claude](https://claude.ai/customize/connectors?modal=add-custom-connector&connectorName=VocaLingo&connectorUrl=https%3A%2F%2Fnodejs.vocalingo.app%2Fmcp)** — the "Add custom connector" dialog opens with the name and URL filled in. Or add it by hand: Customize → **Connectors** → **Add custom connector**, URL `https://nodejs.vocalingo.app/mcp`.
+2. Click **Add**, then **Connect**.
+3. Sign in to VocaLingo: email code, Google, or a one-time code from the app (**Settings → AI agents (MCP)** → "Get a sign-in code" — handy if you signed up with Apple).
+
+The connector then works in claude.ai, Claude Desktop and the Claude mobile apps.
+
+### ChatGPT (sign in, no token)
+
+1. Open [chatgpt.com/plugins](https://chatgpt.com/plugins) → **+** → **Add custom MCP server** (availability depends on your plan and workspace policy).
+2. Name `VocaLingo`, URL `https://nodejs.vocalingo.app/mcp`, authentication **OAuth** → **I understand and want to continue** → **Create**.
+3. Sign in to VocaLingo the same way as above.
 
 No VocaLingo account yet? Install the app ([vocalingo.app](https://vocalingo.app)) and sign up with your email first.
 
@@ -36,7 +44,7 @@ No VocaLingo account yet? Install the app ([vocalingo.app](https://vocalingo.app
 claude mcp add --transport http vocalingo https://nodejs.vocalingo.app/mcp
 ```
 
-Claude Code opens the browser to sign in. Prefer a token? Copy it from the app (**Settings → API / MCP Token**) and add `--header "Authorization: Bearer vlmcp_YOUR_TOKEN"`.
+Claude Code opens the browser to sign in. Prefer a token? Copy it from the app (**Settings → AI agents (MCP)**) and add `--header "Authorization: Bearer vlmcp_YOUR_TOKEN"`.
 
 ### Cursor, Windsurf, VS Code and others
 
@@ -53,7 +61,7 @@ Claude Code opens the browser to sign in. Prefer a token? Copy it from the app (
 }
 ```
 
-The token is in the app: **Settings → API / MCP Token**. More snippets (incl. Claude Desktop via `mcp-remote` with a token): [configs/](configs/).
+The token is in the app: **Settings → AI agents (MCP)**. More snippets (incl. Claude Desktop via `mcp-remote` with a token): [configs/](configs/).
 
 ## Try it
 
@@ -67,11 +75,14 @@ The token is in the app: **Settings → API / MCP Token**. More snippets (incl. 
 
 ## Files
 
-Your agent passes files in one `source` parameter:
+How to send audio, video or a photo:
 
-1. **A link** — YouTube/TikTok/Instagram (for `summarize_media`), a Telegram Bot API file link, any public file URL. Just paste it.
-2. **A local file** — the agent calls `get_upload_url`, uploads with the returned `curl` command, and passes the `fileId`. Works in Claude Code, Cursor, OpenClaw and in Claude's code-execution sandbox (allow the domain `sb.vocalingo.app` once: Settings → Capabilities → Code execution → Additional allowed domains).
-3. **No shell?** `get_upload_url` also returns a drag&drop page link — drop the file in the browser.
+1. **A link** — YouTube/TikTok/Instagram, a Telegram Bot API file link, any public file URL. Just paste it into the message.
+2. **ChatGPT** — attach the file to your message. ChatGPT hands it to the tool directly (the `file` parameter).
+3. **claude.ai, Claude apps** — ask Claude to upload a file. It calls `get_upload_url`, and an **upload button appears right in the chat**: pick the file, and the chat gets a message with its `fileId` so Claude continues on its own. No button? Claude gives you a link to an upload page instead — drop the file there and write "done".
+4. **Agents with a shell** (Claude Code, Cursor, OpenClaw) — just give the path. The agent calls `get_upload_url`, uploads with the returned `curl` command and passes the `fileId`.
+
+Only need the text on a photo read or translated? Claude and ChatGPT can do that themselves — VocaLingo's `translate_image` is for getting the picture itself back with the text redrawn in another language.
 
 ## Pricing and safety
 
@@ -100,13 +111,13 @@ Built so that even a small model can't burn your balance:
 ## Troubleshooting
 
 - **A job stays `processing`.** Normal for dubbing (5–30 min). Keep calling `check_job` with the same `jobId`. You can close the chat — results appear in the app history and in `check_job` without a `jobId`.
-- **Upload fails with a network error in Claude's sandbox.** Allow `sb.vocalingo.app` (see Files) or use the browser upload link.
+- **No upload button in Claude.** Ask Claude for the upload page link and drop the file there. If Claude tries to upload from its code sandbox and gets a network error, allow `sb.vocalingo.app` once (Settings → Capabilities → Code execution → Additional allowed domains).
 - **`insufficient_balance`.** Top up in the app (Profile → Balance) and retry.
 - **`429`.** Max 60 requests/min per account and 3 concurrent jobs.
 
 ## Security
 
-- Sign-in connections and the personal token (`vlmcp_…`) can be turned off any time: **Settings → API / MCP Token → Disable**. Regenerating the token kills the old one within a minute.
+- Sign-in connections and the personal token (`vlmcp_…`) can be turned off any time: **Settings → AI agents (MCP) → Disable**. Regenerating the token kills the old one within a minute.
 - Anyone with your token can spend your balance — keep it secret.
 - Only clone voices you own or have consent to use. Uploaded files are deleted after 48 hours.
 

@@ -5,6 +5,8 @@ All 15 tools of the VocaLingo MCP server (`https://nodejs.vocalingo.app/mcp`).
 Conventions:
 
 - **`source`** — every tool that takes a file has one `source` parameter: either a **fileId** from `get_upload_url` or a **public https link** (YouTube/TikTok/Instagram for `summarize_media` and `download_media`, a Telegram Bot API file link, any direct file URL). A local path like `/Users/me/voice.ogg` is rejected with instructions to upload it first.
+- **`file`** (ChatGPT) — the same tools declare `_meta["openai/fileParams"]: ["file"]`, so a file the user attached in ChatGPT arrives as `{ download_url, file_id, mime_type, file_name }` and `source` can be omitted. The server imports it once per `file_id`.
+- **Upload button** — `get_upload_url` carries an MCP App (`ui://vocalingo/upload-file`). Hosts that support MCP Apps (claude.ai, Claude apps, ChatGPT) show a file picker under the call; after the upload it posts a chat message with the `fileId`. Clients without MCP Apps use `curlCommand` or `browserUploadUrl` as before.
 - **Credits** — the same tokens you see in the VocaLingo app, spent from the same balance.
 - **Confirmation** — a call that would cost **50+ credits** does not start. It returns `status: "confirmation_required"` with the price and a `confirmToken`. The agent asks you; if you agree, it repeats the same call with `confirmToken`. A token is bound to your account and to those exact arguments, valid 30 minutes.
 - **`dryRun: true`** — returns only the estimate (plus a `confirmToken` for expensive calls); nothing starts.

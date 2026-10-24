@@ -8,7 +8,7 @@ claude mcp add --transport http vocalingo https://nodejs.vocalingo.app/mcp
 
 Then run `/mcp` in Claude Code, pick `vocalingo` and sign in in the browser with the email of your VocaLingo account.
 
-Or with a personal token (copy it in the VocaLingo app: **Settings → API / MCP Token**):
+Or with a personal token (copy it in the VocaLingo app: **Settings → AI agents (MCP)**):
 
 ```bash
 claude mcp add --transport http vocalingo https://nodejs.vocalingo.app/mcp \
