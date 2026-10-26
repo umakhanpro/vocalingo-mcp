@@ -91,15 +91,15 @@ Tools spend VocaLingo tokens from your balance, the same tokens as in the app. N
 | Operation | Approximate cost |
 |---|---|
 | Transcribe a voice message | ~1 token per 2 min |
-| Summarize a 10-min video | ~4 tokens |
-| Translate a 1-min voice message in the same voice | ~2–3 tokens (+150 for languages outside en, ru, zh, de, fr, es, it, ja, ko, pt) |
-| Voice 1000 characters in your voice | ~9–10 tokens |
+| Summarize a 10-min video | ~8 tokens |
+| Translate a 1-min voice message in the same voice | ~2–3 tokens (+180 for languages outside en, ru, zh, de, fr, es, it, ja, ko, pt) |
+| Voice 1000 characters in your voice | ~11–12 tokens |
 | Save a voice | ~1 token |
 | Translate a photo | 4–6 tokens |
-| Change the voice in a 1-min recording | ~12 tokens |
+| Change the voice in a 1-min recording | ~14 tokens |
 | Download a video or audio | free |
 | Subtitles for a 5-min video | ~5–10 tokens |
-| Dub a 5-min video | ~1100 tokens |
+| Dub a 5-min video | ~1200 tokens |
 
 Built so that even a small model can't burn your balance:
 

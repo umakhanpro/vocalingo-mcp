@@ -36,7 +36,7 @@ translate_audio { source: "<fileId>", targetLanguage: "en" }
    → or { jobId, status: "processing" } → check_job { jobId }
 ```
 
-`voice` defaults to `"clone"` — a one-off clone of the speaker from this audio, nothing is saved. Cheap for en, ru, zh, de, fr, es, it, ja, ko, pt (min 3 s of speech). Other target languages use MiniMax (min 10 s, ~150 tokens extra) → you'll get `confirmation_required` first. `voice: "none"` = text only; a `voiceId` from `list_voices` = that saved voice.
+`voice` defaults to `"clone"` — a one-off clone of the speaker from this audio, nothing is saved. Cheap for en, ru, zh, de, fr, es, it, ja, ko, pt (min 3 s of speech). Other target languages use MiniMax (min 10 s, ~180 tokens extra) → you'll get `confirmation_required` first. `voice: "none"` = text only; a `voiceId` from `list_voices` = that saved voice.
 
 **Summarize a YouTube / TikTok / Instagram video**
 
@@ -159,7 +159,7 @@ Voices a text and returns `audioUrl`. The provider is picked from `voice`:
 | `dryRun` | bool? | Estimate only |
 | `confirmToken` | string? | For runs of 50+ tokens |
 
-~9–10 tokens per 1000 characters with your own voice. Long texts may come back as `status: "processing"` + `jobId`.
+~11–12 tokens per 1000 characters with your own voice. Long texts may come back as `status: "processing"` + `jobId`.
 
 ---
 
@@ -192,7 +192,7 @@ Result (directly or via `check_job`): `transcript`, `translatedText`, `summary`,
 
 ## Video
 
-### `summarize_media` — paid (~0.42 tokens/min)
+### `summarize_media` — paid (~0.8 tokens/min)
 
 | Param | Type | Description |
 |---|---|---|
@@ -203,7 +203,7 @@ Result (directly or via `check_job`): `transcript`, `translatedText`, `summary`,
 
 Result: title, structured summary (content type, key moments with timecodes, verbatim quotes, takeaway, chapters; Q&A, terms or action items depending on content), a transcript preview, and — via `check_job` `include` — the full transcript and timecoded segments.
 
-### `translate_video` — paid (~220 tokens/min, confirmed)
+### `translate_video` — paid (~240 tokens/min, confirmed)
 
 Dubbing with voice cloning and optional lip-sync. Needs the video **file**. Max 30 minutes; takes 5–30 minutes.
 
