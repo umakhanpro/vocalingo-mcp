@@ -1,0 +1,35 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "vocalingo",
+  "version": "1.0.0",
+  "description": "Summarize YouTube and TikTok videos, transcribe and translate voice messages keeping the speaker's voice, read text in your own cloned voice, add subtitles and dub videos.",
+  "author": { "name": "VocaLingo", "url": "https://vocalingo.app" },
+  "homepage": "https://vocalingo.app",
+  "repository": "https://github.com/umakhanpro/vocalingo-mcp",
+  "license": "MIT",
+  "keywords": ["video summary", "youtube", "transcription", "speech to text", "voice translation", "text to speech", "voice cloning", "subtitles", "dubbing", "mcp"],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "VocaLingo",
+        "shortDescription": "Video summaries, voice messages, your own voice, subtitles and dubbing",
+        "longDescription": "Summarize YouTube and TikTok videos, transcribe and translate voice messages keeping the speaker's voice, read text in your own cloned voice, add subtitles and dub videos. Results also appear in the VocaLingo app. Tools spend VocaLingo tokens from your account; anything that costs 50 tokens or more asks you first.",
+        "developerName": "VocaLingo",
+        "category": "Productivity",
+        "capabilities": ["Read", "Write"],
+        "websiteURL": "https://vocalingo.app",
+        "privacyPolicyURL": "https://www.vocalingo.app/en/privacy-policy",
+        "termsOfServiceURL": "https://www.vocalingo.app/en/terms",
+        "defaultPrompt": [
+          "Summarize this YouTube video: <link>",
+          "Transcribe this voice message",
+          "Translate this voice message into English keeping the voice",
+          "Read this text aloud in my voice"
+        ],
+        "brandColor": "#C9962E",
+        "composerIcon": "./assets/logo.png",
+        "logo": "./assets/logo.png"
+      }
+    }
+  }
+}

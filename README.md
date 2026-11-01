@@ -20,6 +20,42 @@ Works with claude.ai, Claude Desktop, Claude Code, ChatGPT, Cursor, Windsurf, VS
 
 [Full reference](docs/tools.md).
 
+## Install as a plugin
+
+The plugin connects the server and adds skills: step-by-step recipes your agent follows for each task (summarize a video, transcribe a voice message, translate it in the same voice, speak in your voice, subtitles, dubbing, change a voice, translate an image). You sign in to VocaLingo in the browser on first use.
+
+**Claude Code**
+
+```bash
+claude plugin install vocalingo --marketplace umakhanpro/vocalingo-mcp
+```
+
+Or inside a session: `/plugin install vocalingo --marketplace umakhanpro/vocalingo-mcp`. Then run `/mcp`, pick `plugin:vocalingo:vocalingo` and sign in.
+
+**Codex**
+
+```bash
+codex plugin marketplace add umakhanpro/vocalingo-mcp
+```
+
+Then install `vocalingo` from the plugin list.
+
+**Gemini CLI**
+
+```bash
+gemini extensions install https://github.com/umakhanpro/vocalingo-mcp
+```
+
+**Cursor**: in the Cursor Marketplace, or add the server by hand as shown below.
+
+**Skills only** (any agent that supports [Agent Skills](https://agentskills.io)):
+
+```bash
+npx skills add umakhanpro/vocalingo-mcp
+```
+
+Skills need the server connected: see the next section.
+
 ## Connect
 
 ### claude.ai, Claude Desktop, Claude mobile (sign in, no token)

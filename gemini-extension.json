@@ -1,0 +1,9 @@
+{
+  "name": "vocalingo",
+  "version": "1.0.0",
+  "description": "Summarize YouTube and TikTok videos, transcribe and translate voice messages keeping the speaker's voice, read text in your own cloned voice, add subtitles and dub videos.",
+  "contextFileName": "GEMINI.md",
+  "mcpServers": {
+    "vocalingo": { "httpUrl": "https://nodejs.vocalingo.app/mcp" }
+  }
+}

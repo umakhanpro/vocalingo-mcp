@@ -1,0 +1,15 @@
+{
+  "name": "vocalingo",
+  "displayName": "VocaLingo",
+  "version": "1.0.0",
+  "description": "Summarize YouTube and TikTok videos, transcribe and translate voice messages keeping the speaker's voice, read text in your own cloned voice, add subtitles and dub videos.",
+  "author": { "name": "VocaLingo", "url": "https://vocalingo.app" },
+  "homepage": "https://vocalingo.app",
+  "repository": "https://github.com/umakhanpro/vocalingo-mcp",
+  "license": "MIT",
+  "keywords": ["video summary", "youtube", "transcription", "speech to text", "voice translation", "text to speech", "voice cloning", "subtitles", "dubbing", "mcp"],
+  "logo": "assets/logo.png",
+  "mcpServers": {
+    "vocalingo": { "url": "https://nodejs.vocalingo.app/mcp" }
+  }
+}

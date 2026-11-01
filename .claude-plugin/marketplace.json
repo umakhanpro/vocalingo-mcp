@@ -1,0 +1,15 @@
+{
+  "name": "vocalingo",
+  "description": "VocaLingo for AI agents: video summaries, voice messages, your own voice, subtitles and dubbing.",
+  "owner": {
+    "name": "VocaLingo",
+    "url": "https://vocalingo.app"
+  },
+  "plugins": [
+    {
+      "name": "vocalingo",
+      "source": "./",
+      "description": "Summarize YouTube and TikTok videos, transcribe and translate voice messages keeping the speaker's voice, read text in your own cloned voice, add subtitles and dub videos."
+    }
+  ]
+}
