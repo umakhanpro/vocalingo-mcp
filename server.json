@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.umakhanpro/vocalingo",
   "title": "VocaLingo",
-  "description": "Summarize videos, transcribe and translate voice messages keeping the speaker's voice, speak in your own cloned voice, subtitles and dubbing.",
+  "description": "Video summaries, voice message transcription and translation in the same voice, your own voice TTS",
   "version": "2.0.0",
   "websiteUrl": "https://vocalingo.app",
   "repository": {
@@ -13,6 +13,15 @@
     {
       "type": "streamable-http",
       "url": "https://nodejs.vocalingo.app/mcp"
+    }
+  ],
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/umakhanpro/vocalingo-mcp/main/assets/logo.png",
+      "mimeType": "image/png",
+      "sizes": [
+        "1200x1200"
+      ]
     }
   ]
 }
