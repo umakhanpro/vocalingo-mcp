@@ -14,7 +14,7 @@ Works through the VocaLingo MCP server (`https://nodejs.vocalingo.app/mcp`). Too
    - YouTube, TikTok, Instagram or another platform link: call `download_media { source: "<link>" }` first and use the `source` it returns. `caption_video` does not accept platform links.
 2. Call `caption_video { source }`.
    - `targetLanguage` translates the subtitles; leave it out to keep the original language.
-   - `style`: `classic-outline` (default), `tiktok-bold`, `boxed`, `minimal`, `cinematic-top`, `neon-cyan`, `yellow-pop`, `subtitle-pill`, `red-punch`, `premium-gold`. Suggest `tiktok-bold` for vertical shorts.
+   - `style`: `classic-outline` (default), `tiktok-bold`, `boxed`, `minimal`, `cinematic-top`, `neon-cyan`, `yellow-pop`, `subtitle-pill`, `red-punch`, `premium-gold`, `amber-italic-box`, `amber-italic-block`. Suggest `tiktok-bold` for vertical shorts.
 3. You get a `jobId`: call `check_job { jobId }` with the same id until it finishes, then give the user the video link.
 
 ## Cost

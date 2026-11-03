@@ -221,7 +221,7 @@ Dubbing with voice cloning and optional lip-sync. Needs the video **file**. Max 
 |---|---|---|
 | `source` | string | fileId or direct file link (max 100 MB) |
 | `targetLanguage` | string? | Translate the subtitles; omit for the original language |
-| `style` | string? | `classic-outline` (default), `tiktok-bold`, `boxed`, `minimal`, `cinematic-top`, `neon-cyan`, `yellow-pop`, `subtitle-pill`, `red-punch`, `premium-gold` |
+| `style` | string? | `classic-outline` (default), `tiktok-bold`, `boxed`, `minimal`, `cinematic-top`, `neon-cyan`, `yellow-pop`, `subtitle-pill`, `red-punch`, `premium-gold`, `amber-italic-box`, `amber-italic-block` |
 | `dryRun` | bool? | Estimate only |
 | `confirmToken` | string? | For long videos (50+ tokens) |
 
